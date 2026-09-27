@@ -1,0 +1,36 @@
+# Provides a reproducible local PostgreSQL instance for this project. This does
+# NOT containerize the backend or frontend - both are still run directly with
+# `mvn spring-boot:run` / `npm start` (see README). Adding a database-only
+# compose file removes the "go install PostgreSQL yourself" step without
+# pulling the whole app into Docker, which isn't needed for a project this
+# size and would add complexity without a real benefit.
+#
+# Usage:
+#   docker compose up -d
+#   # then point the backend at it (these are already the defaults in
+#   # backend/src/main/resources/application.yml):
+#   #   DB_URL=jdbc:postgresql://localhost:5432/ai_incident_db
+#   #   DB_USERNAME=postgres
+#   #   DB_PASSWORD=postgres
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ai-incident-platform-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-ai_incident_db}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ai_incident_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-ai_incident_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ai_incident_pgdata:

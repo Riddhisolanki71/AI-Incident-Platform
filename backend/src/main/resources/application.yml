@@ -1,0 +1,45 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: ai-incident-platform
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ai_incident_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # 'update' is convenient for the base version so the schema is created automatically.
+      # Switch to 'validate' + a migration tool (e.g. Flyway) once the schema stabilizes.
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: ${SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+app:
+  jwt:
+    # Must be set as an environment variable in real deployments. Never commit a real secret.
+    secret: ${JWT_SECRET:CHANGE_ME_DEV_ONLY_CHANGE_ME_DEV_ONLY_CHANGE_ME}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000} # 24h
+
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+
+  ai:
+    # provider = "anthropic" uses the real Claude API. provider = "mock" uses a clearly-labelled
+    # deterministic mock implementation (useful when no API key is configured).
+    provider: ${AI_PROVIDER:mock}
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+      model: ${ANTHROPIC_MODEL:claude-3-5-haiku-20241022}
+      api-url: ${ANTHROPIC_API_URL:https://api.anthropic.com/v1/messages}
+
+logging:
+  level:
+    com.aiincident: ${LOG_LEVEL:INFO}
