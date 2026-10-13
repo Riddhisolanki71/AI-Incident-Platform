@@ -186,7 +186,7 @@ rollout would swap this for versioned migrations (Flyway/Liquibase) - see Limita
 
 **Ticket Details and AI Analysis**
 
-![Customer ticket details](screenshots/10-customer-ticket-details.png)
+![Customer ticket details](screenshots/10-customer_ticket_details.png)
 
 ### Admin and Support Features
 
