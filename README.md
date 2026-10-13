@@ -38,7 +38,7 @@ resolution).
 ```
 ┌─────────────────┐        REST/JSON + JWT        ┌───────────────────────┐
 │  React frontend │ ─────────────────────────────▶ │  Spring Boot backend  │
-│  (port 3000)    │ ◀───────────────────────────── │  (port 8080)          │
+│  (port 3000)    │ ◀───────────────────────────── │  (port 8081)          │
 └─────────────────┘                                └───────────┬───────────┘
                                                                  │ JPA / Hibernate
                                                                  ▼
@@ -159,14 +159,56 @@ rollout would swap this for versioned migrations (Flyway/Liquibase) - see Limita
 |--------|------|------------------------------------------------------------------|
 | GET    | `/`  | Totals, counts by status, high-priority count, counts by category |
 
+
 ## 7. Screenshots
 
-Not included in this repository. The project was audited and hardened in a sandboxed
-environment with no way to actually run PostgreSQL or serve the frontend in a browser
-(see section 15, "What Could Not Be Verified Here") - so rather than fabricate
-screenshots of a UI that was never actually rendered, this section is left as a TODO.
-Once you run the app locally, screenshots of the login page, both dashboards, and the
-ticket detail page would belong here.
+### Backend Testing
+
+![Backend automated tests](screenshots/01-backend-automated-tests.png)
+
+### Customer Features
+
+**Registration**
+
+![Customer registration](screenshots/02-customer-registration.png)
+
+**Customer Dashboard**
+
+![Customer dashboard](screenshots/02-customer-dashboard.png)
+
+**Ticket Creation**
+
+![Ticket creation](screenshots/03-ticket-creation.png)
+
+**Customer Ticket History**
+
+![Customer ticket history](screenshots/04-customer-ticket-history.png)
+
+**Ticket Details and AI Analysis**
+
+![Customer ticket details](screenshots/10-customer-ticket-details.png)
+
+### Admin and Support Features
+
+**Support Dashboard**
+
+![Admin dashboard](screenshots/06-admin-dashboard.png)
+
+**Ticket Status Management**
+
+![Admin status update](screenshots/07-admin-status-update.png)
+
+**Internal Notes**
+
+![Admin internal notes](screenshots/08-admin-internal-note.png)
+
+**Agent Assignment**
+
+![Agent assignment](screenshots/09-agent-assignment.png)
+
+**Database Users**
+
+![Database users](screenshots/05-database-users.png)
 
 ## 8. AI Workflow
 
@@ -245,7 +287,7 @@ export ADMIN_EMAIL=admin@example.com   # optional, seeds one admin account on fi
 export ADMIN_PASSWORD=ChangeMe123!
 mvn spring-boot:run
 ```
-The API is now at `http://localhost:8080/api`. `.env.example` is documentation of every
+The API is now at `http://localhost:8081/api`. `.env.example` is documentation of every
 variable the backend reads (see section 10) - it is **not** automatically loaded by
 Spring Boot, so actually `export` these (or set them in your IDE's run configuration,
 your shell profile, or however you manage environment variables) before starting it.
@@ -258,7 +300,7 @@ npm install
 npm start
 ```
 Opens at `http://localhost:3000`, talking to the backend at `REACT_APP_API_BASE_URL`
-(from `.env`, defaults to `http://localhost:8080/api`).
+(from `.env`, defaults to `http://localhost:8081/api`).
 
 ## 10. Environment Variables
 
@@ -266,22 +308,22 @@ Never hardcode secrets - every one of these is read from the environment (see
 `backend/src/main/resources/application.yml` for how each maps to a Spring property, and
 `backend/.env.example` / `frontend/.env.example` for a documented reference file).
 
-| Variable                | Required   | Description                                                      |
-|--------------------------|------------|----------------------------------------------------------------|
-| `DB_URL`                | Yes (prod) | JDBC URL, e.g. `jdbc:postgresql://localhost:5432/ai_incident_db` |
-| `DB_USERNAME`           | Yes        | Database username                                                 |
-| `DB_PASSWORD`           | Yes        | Database password                                                 |
+| Variable                | Required   | Description                                                                                                                                                                                           |
+|--------------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `DB_URL`                | Yes (prod) | JDBC URL, e.g. `jdbc:postgresql://localhost:5432/ai_incident_db`                                                                                                                                      |
+| `DB_USERNAME`           | Yes        | Database username                                                                                                                                                                                     |
+| `DB_PASSWORD`           | Yes        | Database password                                                                                                                                                                                     |
 | `JWT_SECRET`            | Yes        | Random secret used to sign JWTs, **at least 32 bytes** - the app now refuses to start if it's shorter, and refuses to start with the built-in placeholder if `spring.profiles.active` includes `prod` |
-| `JWT_EXPIRATION_MS`     | No         | Token lifetime in ms (default 24h)                                 |
-| `AI_PROVIDER`           | No         | `anthropic` to use the real API, `mock` (default) to force the mock |
-| `ANTHROPIC_API_KEY`     | No*        | Your Anthropic API key. Without it, AI analysis silently falls back to the mock |
-| `ANTHROPIC_MODEL`       | No         | Defaults to `claude-3-5-haiku-20241022`                            |
-| `ANTHROPIC_API_URL`     | No         | Defaults to `https://api.anthropic.com/v1/messages`                |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | No | If both set, seeds one `ADMIN` account on first startup      |
-| `CORS_ALLOWED_ORIGINS`  | No         | Defaults to `http://localhost:3000`. Comma-separated for multiple origins |
-| `SERVER_PORT`           | No         | Defaults to `8080`                                                 |
-| `DDL_AUTO`              | No         | Defaults to `update`; set to `validate` once you introduce real migrations |
-| `REACT_APP_API_BASE_URL`| No (frontend) | Defaults to `http://localhost:8080/api`                       |
+| `JWT_EXPIRATION_MS`     | No         | Token lifetime in ms (default 24h)                                                                                                                                                                    |
+| `AI_PROVIDER`           | No         | `anthropic` to use the real API, `mock` (default) to force the mock                                                                                                                                   |
+| `ANTHROPIC_API_KEY`     | No*        | Your Anthropic API key. Without it, AI analysis silently falls back to the mock                                                                                                                       |
+| `ANTHROPIC_MODEL`       | No         | Defaults to `claude-3-5-haiku-20241022`                                                                                                                                                               |
+| `ANTHROPIC_API_URL`     | No         | Defaults to `https://api.anthropic.com/v1/messages`                                                                                                                                                   |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | No | If both set, seeds one `ADMIN` account on first startup                                                                                                                                               |
+| `CORS_ALLOWED_ORIGINS`  | No         | Defaults to `http://localhost:3000`. Comma-separated for multiple origins                                                                                                                             |
+| `SERVER_PORT`           | No         | Defaults to `8081`                                                                                                                                                                                    |
+| `DDL_AUTO`              | No         | Defaults to `update`; set to `validate` once you introduce real migrations                                                                                                                            |
+| `REACT_APP_API_BASE_URL`| No (frontend) | Defaults to `http://localhost:8081/api`                                                                                                                                                               |
 
 \* Required only if you want real AI analysis instead of the mock.
 
